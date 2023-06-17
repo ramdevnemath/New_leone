@@ -16,8 +16,10 @@ router.get('/signup', userauth, userController.userSignup)
 router.post('/signup', userauth, userController.postSignup)
 router.get('/logout', verify, userController.logout)
 router.get('/single-product/:id', userController.userSingleProduct)
-// router.get('/profile', userController.getProfile)
-
+router.get('/mens', userController.mensPage)
+router.get('/womens', userController.womensPage)
+router.get('/kids', userController.kidsPage)
+router.post("/filterproducts",userController.filterProducts)
 //otp route
 router.get('/otp', (req, res) => {
     res.render('users/otp', {other:true})
@@ -26,8 +28,8 @@ router.post('/sendotp', userController.sendOtp);
 router.post('/otp', userController.otpLogin)
 router.post('/verifyotp', userController.verifyOtp)
 
-//add-to-cart route setting
-router.get('/addtoCart/:id', cartController.cartCount,cartController.addtoCart) 
+//cart control
+router.get('/addtoCart/:id', cartController.cartCount, cartController.addtoCart) 
 router.get('/cart', cartController.cartCount, cartController.getCartProducts)
 router.post('/changeProductQuantity', cartController.changeProductQuantity)
 router.post('/removeItem', cartController.removeItem)
@@ -71,7 +73,9 @@ router.patch('/profile/:id', userController.editUserProfile)
 router.patch('/addressEdit', userController.addressEdit)
 router.post('/update-user-password', userController.confirmAndUpdatePassword)
 
-// router.get("/wallet", userController.walletPage);
+//Search control
+router.get('/shop/search/suggestions/',userController.search)
+router.get('/search',userController.searching)
 
 //middleware for preventing loading for strangers
 function userauth(req, res, next) {

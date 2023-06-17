@@ -97,9 +97,9 @@
 							<%= singleProduct.productName %>
 						</h3>
 						<div class="d-flex flex-inline">
-							<% if (offer[0].category === singleProduct.category.category) { %>
+							<% if(discountedPrice !=0) { %>
 								<h2>&#8377;<%= Math.floor(singleProduct.price - (singleProduct.price *
-									(offer[0].discount/100))) %>
+										(offer[0].discount/100))) %>
 								</h2>
 								<h3 class="ml-3" style="color: #d7d6d6;">
 									&#8377;<%= singleProduct.price %>
@@ -107,11 +107,11 @@
 								<h5 class="ml-3 mt-2" style="color: #d7d6d6;">
 									<%= offer[0].discount %>% off
 								</h5>
-							<% } else { %>
-								<h2 class="l-through">
-									&#8377;<%= singleProduct.price %>
-								</h2>
-							<% } %>
+								<% } else { %>
+									<h2 class="l-through">
+										&#8377;<%= singleProduct.price %>
+									</h2>
+									<% } %>
 						</div>
 						<ul class="list">
 							<li><a class="active" href="#"><span>Category</span>
@@ -136,17 +136,13 @@
 							<button id="xxl-btn" class="size-btn">11</button>
 						</div>
 						<br><br>
-						
+
 
 						<div class="card_area d-flex align-items-center">
 							<input type="text" id="hiddenId" value="<%=singleProduct._id%>" hidden>
-							<button id="clicz"
-								<% if (offer[0].category === singleProduct.category.category) { %>
-									onclick="addToCart('<%= singleProduct._id %>','<%= singleProduct.productName %>','<%= singleProduct.stock %>','<%= discountedPrice %>')"
-								<% } else { %>
-								onclick="addToCart('<%= singleProduct._id %>','<%= singleProduct.productName %>','<%= singleProduct.stock %>',0)"
-								<% } %>
-								class="primary-btn">Add to Cart
+							<button id="clicz" data-id="<%= singleProduct._id %>"
+								data-proname="<%= singleProduct.productName %>" data-dis="<%= discountedPrice %>"
+								data-stock="<%= singleProduct.stock %>" class="primary-btn">Add to Cart
 							</button>
 							<a class="icon_btn" href="#"><i class="lnr lnr lnr-heart"></i></a>
 						</div>
@@ -197,10 +193,17 @@
 			});
 		});
 
-		function addToCart(proId, abc, stock, dis) {
+
+		$('#clicz').click(function (event) {
+
+			const proId = $(event.target).data('id')
+			const abc = $(event.target).data('proname')
+			const stock = $(event.target).data('stock')
+			const dis = $(event.target).data('dis')
+
 			const activeBtn = $('.size-btn.size-active');
 			const size = $('.size-btn.size-active').text();
-			
+
 			console.log(proId);
 			if (activeBtn.length > 0) {
 				// Check if the user is logged in
@@ -228,8 +231,8 @@
 									text: 'Product is out of stock',
 								})
 							}
-						} 
-						if(!response.loggedIn) {
+						}
+						if (!response.loggedIn) {
 							// User is not logged in, show an error message and redirect to the login page
 							swal.fire({
 								icon: 'error',
@@ -251,7 +254,7 @@
 					button: 'OK'
 				});
 			}
-		}
+		})
 
 
 	</script>

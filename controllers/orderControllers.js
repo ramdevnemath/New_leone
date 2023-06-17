@@ -42,7 +42,7 @@ exports.orders = async (req, res) => {
   } else {
     res.locals.orders = orders;
   }
-  res.render("users/OrderView", {
+  res.render("users/orderView", {
     footer: false,
     cartCount,
     user: req.session.user,
@@ -262,7 +262,6 @@ exports.invoice = async (req, res) => {
       path: 'products.item',
       model: 'Product'
     }).exec();
-
 
   let product = null;
   for (let i = 0; i < orders.length; i++) {

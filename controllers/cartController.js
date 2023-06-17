@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 const User = require("../models/userSchema");
 const ObjectId = mongoose.Types.ObjectId;
 const Product = require("../models/productSchema");
-const bcrypt = require("bcrypt");
-const { response } = require("../app");
-const flash = require("connect-flash");
-const { success } = require("toastr");
-const { json } = require("body-parser");
+// const bcrypt = require("bcrypt");
+// const { response } = require("../app");
+// const flash = require("connect-flash");
+// const { success } = require("toastr");
+// const { json } = require("body-parser");
 
 
 exports.addtoCart = async (req, res) => {

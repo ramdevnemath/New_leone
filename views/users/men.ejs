@@ -1,0 +1,219 @@
+<style>
+  
+  .filter-section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .filter-option {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+</style>  
+<section class="banner-area organic-breadcrumb">
+    <div class="container">
+        <div class="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-end">
+            <div class="col-first">
+                <h1>Men's Category</h1>
+            </div>
+        </div>
+    </div>
+</section>
+
+<br><br>
+
+<div class="container">
+    <!-- Filter section -->
+    <h3>Filter Options</h3> 
+    <div class="filter-section d-flex justify-content-start">
+        
+      <!-- Price Range -->
+      <div class="filter-option">
+        <h5>Price Range:</h5>
+        <div>
+            <input type="radio" name="price" value="0 - 25000" id="price-25000">
+            <label for="price-all">All</label>
+          </div>
+        <div>
+          <input type="radio" name="price" value="0 - 5000" id="price-5000">
+          <label for="price-5000">0 - 5000</label>
+        </div>
+        <div>
+          <input type="radio" name="price" value="5000 - 10000" id="price-10000">
+          <label for="price-10000">5000 - 10000</label>
+        </div>
+        <div>
+          <input type="radio" name="price" value="10000 - 15000" id="price-15000">
+          <label for="price-15000">10000 - 15000</label>
+        </div>
+        <div>
+          <input type="radio" name="price" value="15000 - 25000" id="price-25000">
+          <label for="price-25000">15000 - 25000</label>
+        </div>
+        <!-- Add more price range options as needed -->
+      </div>
+  
+      <!-- Brand -->
+      <div class="filter-option">
+        <h5>Brand:</h5>
+        <div>
+          <input type="checkbox" name="brand" value="Nike" id="brand-nike">
+          <label for="brand-nike">Nike</label>
+        </div>
+        <div>
+          <input type="checkbox" name="brand" value="Puma" id="brand-puma">
+          <label for="brand-puma">Puma</label>
+        </div>
+        <div>
+          <input type="checkbox" name="brand" value="Adidas" id="brand-adidas">
+          <label for="brand-adidas">Adidas</label>
+        </div>
+        <div>
+          <input type="checkbox" name="brand" value="Leone" id="brand-leone">
+          <label for="brand-leone">Leone</label>
+        </div>
+        <!-- Add more brand options as needed -->
+      </div>
+  
+      <!-- Type -->
+      <div class="filter-option">
+        <h5>Type:</h5>
+        <div>
+          <input type="checkbox" name="type" value="Sneakers" id="type-sneakers">
+          <label for="type-sneakers">Sneakers</label>
+        </div>
+        <div>
+          <input type="checkbox" name="type" value="Shoes" id="type-shoes">
+          <label for="type-shoes">Shoes</label>
+        </div>
+        <div>
+          <input type="checkbox" name="type" value="Sandals" id="type-sandals">
+          <label for="type-sandals">Sandals</label>
+        </div>
+        <!-- Add more type options as needed -->
+    </div>
+    </div>
+    <br>
+    <button class="btn btn-success" onclick="applyFilters()">Apply Filters</button>
+    <br><br>
+    <div class="container"><div id="product-grid" class="row"></div></div>
+  </div>
+  <div class="container">
+    <div class="row" id="all-pro">
+        <!-- single product -->
+        <% products.forEach(element=> { %>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="single-product">
+                    <a href="/single-product/<%= element._id %>">
+                        <img class="product-img img-fluid" src="/admin/uploads/<%= element.image[0]  %>" </a>
+                        <div class="product-details">
+                            <h6>
+                                <%= element.productName %>
+                            </h6>
+                            <div class="price">
+                                <h4>&#8377;<%= element.price %>
+                                </h4>
+                                <!-- <h6 class="l-through">&#8377;999.00</h6> -->
+                            </div>
+                            <div class="prd-bottom">
+                                <a href="" class="social-info">
+                                </a>
+                                <a href="" class="social-info">
+                                </a>
+                                <a href="" class="social-info">
+                                </a>
+                            </div>
+                        </div>
+                </div>
+            </div>
+            <% }) %>
+    </div>
+</div>
+<%- include('../partials/user/userFooter') %>
+
+
+<script>
+function applyFilters() {
+    // Get the selected filter values
+    const price = $('input[name="price"]:checked').val();
+    const company = $('input[name="brand"]:checked')
+      .map(function () {
+        return this.value;
+      })
+      .get();
+    const types = $('input[name="type"]:checked')
+      .map(function () {
+        return this.value;
+      })
+      .get();
+    const category = "Men's";
+  
+    // Create an object with the filter data
+    const filters = {
+      price: price,
+      company: company,
+      types: types,
+      category: category,
+    };
+  
+    // Send the filter data to the server using AJAX
+    $.ajax({
+      url: '/filterproducts',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify(filters),
+      success: function (filteredProducts) {
+        // Call the function to update the product grid with the filtered products
+        updateProductGrid(filteredProducts);
+      },
+      error: function (xhr, textStatus, error) {
+        console.error('Request failed. Status:', xhr.status);
+      }
+    });
+  }
+  
+  function updateProductGrid(products) {
+    const productGrid = document.getElementById('product-grid');
+    const allProDiv = document.getElementById('all-pro');
+  
+    // Disable all-pro div if product-grid is present
+    if (allProDiv && productGrid) {
+      allProDiv.style.display = 'none';
+    }
+  
+    // Clear existing products
+    productGrid.innerHTML = '';
+  
+    if (products.length === 0) {
+      // Display message when no products are found
+      const noProductsMessage = document.createElement('p');
+      noProductsMessage.textContent = 'No products found.';
+      productGrid.appendChild(noProductsMessage);
+    } else {
+      products.forEach(function (product) {
+        const productItem = document.createElement('div');
+        productItem.classList.add('col-lg-3', 'col-md-6', 'single-product');
+        productItem.innerHTML = `
+          <a href="/single-product/${product._id}">
+            <img class="product-img img-fluid" src="/admin/uploads/${product.image[0]}" </a>
+            <div class="product-details">
+              <h6>${product.productName}</h6>
+              <div class="price">
+                <h4>&#8377;${product.price}</h4>
+              </div>
+              <div class="prd-bottom">
+                <a href="" class="social-info"></a>
+                <a href="" class="social-info"></a>
+                <a href="" class="social-info"></a>
+              </div>
+            </div>
+        `;
+        productGrid.appendChild(productItem);
+      });
+    }
+  }
+</script>  

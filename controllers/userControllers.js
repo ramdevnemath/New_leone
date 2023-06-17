@@ -26,7 +26,7 @@ var instance = new Razorpay({
 exports.isLogin = async (req, res, next) => {
   try {
     let user = req.session.user;
-    if (user) { 
+    if (user) {
       next();
     } else {
       res.redirect("/login");
@@ -178,8 +178,9 @@ exports.userSingleProduct = async (req, res) => {
     let user = req.session.user;
     let id = req.params.id;
     let objId = new ObjectId(id);
-    
+
     let singleProduct = await Product.findOne({ _id: objId }).populate('category');
+    console.log(singleProduct,'single product');
     let proid = new ObjectId(singleProduct.category);
     const categoryInfo = await Category.aggregate([
       {
@@ -190,7 +191,12 @@ exports.userSingleProduct = async (req, res) => {
     ]);
     let categoryName = categoryInfo[0].category;
     const offer = await Offer.find({ category: categoryName });
-    let discountedPrice = Math.floor(singleProduct.price-(singleProduct.price * offer[0].discount/100))
+    if(offer.length > 0) {
+      var discountedPrice = Math.floor(singleProduct.price - (singleProduct.price * offer[0].discount / 100))
+    } else {
+      var discountedPrice = 0;
+    }
+    
 
     res.render("users/single-product", {
       footer: true,
@@ -499,6 +505,7 @@ exports.deliveryAddressPost = async (req, res) => {
         },
       },
     ]);
+    
     let status = req.body["payment-method"] === "COD" ? "placed" : "pending";
 
     let orderObj = new Order({
@@ -519,6 +526,7 @@ exports.deliveryAddressPost = async (req, res) => {
       products: cart.products,
       totalAmount: total[0].totalWithTax,
       paymentstatus: status,
+       
       deliverystatus: "not shipped",
       createdAt: new Date(),
     });
@@ -566,9 +574,8 @@ exports.deliveryAddressPost = async (req, res) => {
 
 
 
-    }  else if (req.body["payment-method"] == "Wallet") {
+    } else if (req.body["payment-method"] == "Wallet") {
       if (total[0].totalWithTax <= balance) {
-        console.log("first case");
         // Check if wallet balance is sufficient for the purchase
         // Deduct the purchase amount from the wallet balance
         balance -= total[0].totalWithTax;
@@ -788,15 +795,13 @@ exports.paymentVerify = async (req, res) => {
     if (hmac === details["payment[razorpay_signature]"]) {
 
       let transactionId = String(details["payment[razorpay_payment_id]"]);
-
-
+      console.log(transactionId,"transactionId")
 
       let order = await Order.updateOne(
         { _id: orderObjId },
         {
           $set: {
-            paymentstatus: "placed",
-            transactionId: transactionId, 
+            paymentstatus: "placed"
           },
         }
       );
@@ -892,4 +897,135 @@ exports.confirmAndUpdatePassword = async (req, res) => {
         res.json({ message: "not matching" });
       }
     });
+};
+
+exports.search = async (req, res) => {
+  try {
+    const query = req.query.q || '';
+    if (query.length < 2) {
+      res.json({ suggestions: [] });
+      return;
+    }
+
+    // Perform the search using the query parameter
+    const suggestions = await Product.find({ name: { $regex: query, $options: 'i' } }).limit(10);
+
+    // Return a JSON response with the search suggestions
+    res.json({ suggestions: suggestions.map((product) => product.name) });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while retrieving search suggestions.' });
+  }
+};
+
+exports.searching = async (req, res) => {
+  try {
+    // Get the search query from the request
+    const query = req.query.query;
+
+    // Perform the search operation (e.g., querying a database)
+    const searchProducts = await Product.find({ name: query });
+    console.log(searchProducts, "done");
+    // Return the results as JSON
+    res.json(searchProducts);
+    console.log("sended");
+  } catch (error) {
+    // Handle any errors that occurred during the search
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred during the search.' });
+  }
+};
+
+exports.mensPage = async (req, res) => {
+  try {
+    const category = await Category.findOne({ category: "Men's" });
+    // const catId = category._id;
+    console.log(category,"cat")
+    const products = await Product.find({ category: category }) // Convert the query result to plain JavaScript objects
+    console.log(products,"products")
+    // Get the filter parameters from the request
+    const { price, company, type } = req.query;
+
+    // Apply filters if any
+    let filteredProducts = products;
+
+    if (price) {
+      filteredProducts = filteredProducts.filter(product => product.price >= parseInt(price));
+    }
+    if (company) {
+      filteredProducts = filteredProducts.filter(product => product.company === company);
+    }
+    if (type) {
+      filteredProducts = filteredProducts.filter(product => product.type === type);
+    }
+
+    res.render('users/men', { products: filteredProducts });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+exports.womensPage = async (req, res) => {
+  try {
+    const category = await Category.findOne({category: "Women's"})
+    const catId = category._id
+    const products = await Product.find({category: catId})
+    res.render('users/women', {products})
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+exports.kidsPage = async (req, res) => {
+  try {
+    const category = await Category.findOne({category: "Kid's"})
+    const catId = category._id
+    const products = await Product.find({category: catId})
+    res.render('users/kid', {products})
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+exports.filterProducts = async (req, res) => {
+  try {
+    
+    const { price, company, types, category } = req.body;
+    console.log(req.body,"💕💕💕")
+    // Build the filter object based on the provided criteria
+    const filter = {};
+
+    // Apply the price filter
+
+    if (price !== 'any') {
+      const [minPrice, maxPrice] = price.split(' - ');
+      filter.price = { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) };
+    }
+
+    // Apply the company filter
+    if (company.length > 0) {
+      filter.company = { $in: company };
+    }
+
+    // Apply the type filter
+    if (types.length > 0) {
+      filter.type = { $in: types };
+    }
+
+    console.log(filter,"❤️❤️");
+
+    // Retrieve the filtered products from the database
+    const cat = await Category.findOne({ category: category });
+    const catId = cat._id
+    const filteredProducts = await Product.find({ category: catId, ...filter });
+
+
+    console.log(filteredProducts);
+
+    // Send the filtered products as the response
+    res.json(filteredProducts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };

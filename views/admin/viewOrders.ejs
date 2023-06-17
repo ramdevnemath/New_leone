@@ -123,15 +123,6 @@
                   <% }) %>
           </tbody>
         </table>
-        <nav aria-label="Page navigation example" class="mt-2 mr-3">
-          <ul class="pagination pagination-sm justify-content-center">
-            <% for( let i=1; i <=pages; i++ ) { %>
-              <li class="page-item"><a class="page-link cursor-pointer pagination-button" data-page="<%= i %>">
-                  <%= i %>
-                </a></li>
-              <% } %>
-          </ul>
-        </nav>
       </div>
     </div>
   </div>
@@ -140,17 +131,18 @@
 
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
 <script>
+  $(document).ready(function () {
+    $('#myTable').DataTable({
+      "paging": true,
+      "pageLength": 10,
+      "lengthMenu": [10, 25, 50, 100]
+    });
+  });
 
   function viewDetails(orderId) {
     // Do something with the order ID, such as redirect to a details page
     window.location.href = "/order/details/" + orderId;
   }
-
-
-  $(document).ready(function () {
-    $('#myTable').DataTable();
-  });
-
 
   document.getElementById("my-dropdown").addEventListener("change", function () {
     var selectedValue = this.value;
@@ -171,104 +163,5 @@
       document.getElementById("monthDiv").style.display = "none";
       document.getElementById("dayDiv").style.display = "none";
     }
-  });
-
-  function loadTableData(page) {
-    $.ajax({
-      url: '/admin/order-data',  // Replace with your data source URL
-      method: 'GET',
-      data: { page: page },
-      success: function (response) {
-        // Update the table with the received data
-        var tableRows = '';
-        response.forEach(function (order, index) {
-          order.products.forEach(prd => {
-            tableRows += '<tr>';
-            tableRows += `<th scope="row">
-                    ${index + 1}
-                  </th>`;
-            tableRows += `<td>
-                   ${new Date(order.createdAt).toLocaleString('en-US')}
-                  </td>`;
-            tableRows += `<td>
-                    ${order.firstname} ${order.lastname}
-                  </td>`;
-
-            tableRows += `<td>
-                ${order.deliverDetails.streetaddress}, ${order.deliveryDetails.town}, ${order.deliveryDetails.state}
-                  </td>`;
-
-            tableRows += `<td>${order.deliveryDetails.zip}`;
-
-            tableRows += `<td>
-                              ${order.deliveryDetails.mobile}
-                          </td>`;
-            tableRows += `<td>
-                              ${order.totalAmount}  </td>`;
-            tableRows += `<td>  
-                              ${order.products.reduce((total, product) => total + product.quantity, 0)}  </td>`;
-            tableRows += `<td>
-                            ${order.paymentstatus}</td>`;
-            tableRows += `<td> 
-                            ${order.paymentMethod}</td>`;
-            tableRows += `<td>
-                            ${order.orderstatus}</td> `;
-            tableRows += `<form action="/admin/order-details/?orderId=${order._id}&productId=${prd.item._id}"
-                        method="post">
-                  <td>
-
-                    <select class="btn btn-outline-danger btn-sm" name="deliveryStatus" id=""
-                      ${(prd.orderstatus==='cancelled' || order.paymentstatus==='failed')?'disabled':''}
-
-                      <option value="default">
-                        ${prd.deliverystatus}
-                      </option>
-                      <option value="Shipped">
-                        Shipped
-                      </option>
-                      <option value="Out-for-delivery">
-                        Out for delivery
-                      </option>
-                      <option value="Delivered">
-                        Delivered
-                      </option>
-                      <option value="Returned">
-                        Returned
-                      </option>
-
-                    </select>
-
-
-                  </td>
-                  <td>
-                    <button type="submit" class="btn btn-warning">save</button>
-                  </td>
-                  </form>`
-            tableRows += '</tr>';
-          });
-          $('#order-table tbody').html(tableRows);
-        })
-        // Update the pagination buttons
-        //   $('#pagination-container').html(response.pagination);
-      },
-      error: function (xhr) {
-        // Handle error if any
-        console.log(xhr);
-      }
-    });
-  }
-
-  $(document).on('click', '.pagination-button', function (event) {
-    event.preventDefault()
-    $('.pagination-button').removeClass('active')
-    $(this).addClass('active')
-    var page = $(this).data('page');
-    console.log(page + 'call recived');
-    loadTableData(page);
-  });
-
-  $(document).ready(function () {
-    $('.pagination-button')[0].classList.add('active')
-    loadTableData(1); // Load the initial page
   });
 </script>

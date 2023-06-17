@@ -6,11 +6,210 @@ const Wallet = require('../models/walletSchema')
 const multer = require("multer");
 const bcrypt = require("bcrypt");
 const mongoose = require('mongoose')
+const { startOfMonth, endOfMonth, getMonth, format } = require('date-fns');
 
-exports.getDashboard = async (req, res) => {
-  let adminDetails = req.session.admin
-  res.render("admin/adminHome", { admin:true, adminDetails });
+exports.getDashboard = async (req, res, next) => {
+  let adminDetails = req.session.admin;
+  const orders = await Order.find({})
+    .populate({
+      path: "products.item",
+      model: "Product",
+    })
+    .exec();
+
+  const totalQuantity = orders.reduce((accumulator, order) => {
+    order.products.forEach((product) => {
+      accumulator += product.quantity;
+    });
+    return accumulator;
+  }, 0);
+
+  const totalProfit = orders.reduce((acc, order) => {
+    return acc + order.totalAmount;
+  }, 0);
+
+  const totalShipped = orders.reduce((accumulator, order) => {
+    order.products.forEach((product) => {
+      if (product.deliverystatus === "shipped") {
+        accumulator += 1;
+      }
+    });
+    return accumulator;
+  }, 0);
+  const totalCancelled = orders.reduce((accumulator, order) => {
+    order.products.forEach((product) => {
+      if (product.orderstatus === "cancelled") {
+        accumulator += 1;
+      }
+    });
+    return accumulator;
+  }, 0);
+
+ 
+  //console.log(orders.products,"zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
+
+
+ 
+
+  const categoryCounts = await (async () => {
+    try {
+      // Retrieve all orders
+      console.log(orders, "order details");
+  
+      // Object to store category names and their respective count
+      const categoryCount = {};
+  
+      // Iterate over the orders
+      for (const order of orders) {
+        // Iterate over the products within each order
+        for (const product of order.products) {
+          // Retrieve the category from the "item" field
+          const categoryId = product.item.category;
+  
+          // Populate the category field with actual category data
+          const category = await Category.findById(categoryId).exec();
+  
+          // Increment the category count
+          if (category) {
+            const categoryName = category.category;
+  
+            if (categoryCount[categoryName]) {
+              categoryCount[categoryName].count++;
+            } else {
+              categoryCount[categoryName] = {
+                name: categoryName,
+                count: 1,
+              };
+            }
+          }
+        }
+      }
+  
+      // Object to store category names and their respective count
+      const categoryCounts = {};
+  
+      // Output the category names and counts
+      for (const categoryName in categoryCount) {
+        const categoryData = categoryCount[categoryName];
+        console.log(`Category: ${categoryData.name}, Count: ${categoryData.count}`);
+        categoryCounts[categoryData.name] = categoryData.count;
+      }
+  
+      console.log(categoryCounts);
+  
+      // Return the categoryCounts object
+      return categoryCounts;
+    } catch (error) {
+      console.error(error);
+    }
+  })();
+  
+  
+  
+     console.log(categoryCounts,"cxcxccxcxccxccxcxc");
+
+
+
+
+  function countPaymentMethods(orders) {
+    let paymentCounts = {
+      RazorPay: 0,
+      COD: 0,
+      Wallet: 0,
+    };
+
+    for (let order of orders) {
+      const paymentMethod = order.paymentMethod;
+
+      switch (paymentMethod) {
+        case "RazorPay":
+          paymentCounts.RazorPay++;
+          break;
+        case "COD":
+          paymentCounts.COD++;
+          break;
+        case "Wallet":
+          paymentCounts.Wallet++;
+          break;
+      }
+    }
+
+    return paymentCounts;
+  }
+
+  function calculatePaymentMethodPercentage(orders) {
+    let paymentCounts = countPaymentMethods(orders);
+    let totalOrders = orders.length;
+
+    let paymentPercentages = {};
+
+    for (let paymentMethod in paymentCounts) {
+      let count = paymentCounts[paymentMethod];
+      let percentage = (count / totalOrders) * 100;
+      paymentPercentages[paymentMethod] = percentage.toFixed(2) + "%";
+    }
+
+    return paymentPercentages;
+  }
+
+  const paymentPercentages = calculatePaymentMethodPercentage(orders);
+  console.log(paymentPercentages);
+
+  //console.log(totPayment,"xxxxxxxxxxxx");
+
+  const startOfYear = new Date(new Date().getFullYear(), 0, 1); // start of the year
+  const endOfYear = new Date(new Date().getFullYear(), 11, 31); // end of the year
+
+  let orderBasedOnMonths = await Order.aggregate([
+    // match orders within the current year
+    { $match: { createdAt: { $gte: startOfYear, $lte: endOfYear } } },
+
+    // group orders by month
+    {
+      $group: {
+        _id: { $month: "$createdAt" },
+        orders: { $push: "$$ROOT" },
+      },
+    },
+
+    // project the month and orders fields
+    {
+      $project: {
+        _id: 0,
+        month: "$_id",
+        orders: 1,
+      },
+    },
+    {
+      $project: {
+        month: 1,
+        orderCount: { $size: "$orders" },
+      },
+    },
+    {
+      $sort: { month: 1 },
+    },
+  ]);
+
+  // console.log(orderBasedOnMonths, "vall");
+  order_count = orderBasedOnMonths[0]["orderCount"];
+  // console.log(order_count);
+  //  console.log(totalQuantity,totalProfit,totalShipped,totalCancelled,'ordercount')
+  res.render("admin/adminHome", {
+    admin: true,
+    adminDetails,
+    totalQuantity,
+    order_count,
+    totalProfit,
+    totalShipped,
+    totalCancelled,
+    orderBasedOnMonths,
+    noShow: true,
+    paymentPercentages,
+    categoryCounts,
+  });
 };
+
 
 exports.adminLogin = async (req, res) => {
   if (req.session.admin) {

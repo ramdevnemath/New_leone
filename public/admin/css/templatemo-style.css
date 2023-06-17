@@ -30,14 +30,14 @@ button:focus {
   align-items: center;
 }
 .tm-site-icon {
-  color: #656565;
+  color: #ffffff;
 }
 .tm-site-title {
   display: inline-block;
   text-transform: uppercase;
   font-size: 1.3rem;
   font-weight: 700;
-  color: #fff;
+  color: #ffffff;
 }
 .navbar {
   height: 100px;
@@ -174,7 +174,7 @@ button:focus {
 .tm-gray-circle {
   width: 80px;
   height: 80px;
-  background-color: #aaa;
+  background-color: #ffffff;
   border-radius: 50%;
   margin-right: 15px;
 }
@@ -196,7 +196,7 @@ button:focus {
   color: #f5a623;
 }
 .tm-text-color-secondary {
-  color: #bdcbd8;
+  color: #ffffff;
 }
 .tm-small {
   font-size: 90%;
@@ -510,7 +510,7 @@ input[type="checkbox"]:focus {
   align-items: center;
   justify-content: center;
   color: #fff;
-  background: #aaa;
+  background: #ffffff;
 }
 .tm-product-img-edit {
   max-width: 100%;

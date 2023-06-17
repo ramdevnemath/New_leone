@@ -1,0 +1,44 @@
+<section class="banner-area organic-breadcrumb">
+    <div class="container">
+        <div class="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-end">
+            <div class="col-first">
+                <h1>Kid's Category</h1>
+            </div>
+        </div>
+    </div>
+</section>
+<br><br>
+<div class="container">
+<div class="row">
+    <!-- single product -->
+    <% products.forEach(element=> { %>
+        <div class="col-lg-3 col-md-6">
+            <div class="single-product">
+                <a href="/single-product/<%= element._id %>">
+                    <img class="product-img img-fluid" src="/admin/uploads/<%= element.image[0]  %>"
+                        </a>
+                    <div class="product-details">
+                        <h6>
+                            <%= element.productName %>
+                        </h6>
+                        <div class="price">
+                            <h4>&#8377;<%= element.price %>
+                            </h4>
+                            <!-- <h6 class="l-through">&#8377;999.00</h6> -->
+                        </div>
+                        <div class="prd-bottom">
+                            <a href=""
+                                class="social-info">
+                            </a>
+                            <a href="" class="social-info">
+                            </a>
+                            <a href="" class="social-info">
+                            </a>
+                        </div>
+                    </div>
+            </div>
+        </div>
+        <% }) %>
+</div>
+</div>
+<%- include('../partials/user/userFooter') %>
