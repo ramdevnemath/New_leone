@@ -2,6 +2,7 @@ const userController = require('../controllers/userControllers')
 const cartController = require('../controllers/cartController')
 const orderController = require('../controllers/orderControllers')
 const couponController = require('../controllers/couponControllers')
+const productController = require('../controllers/productControllers')
 const otplib = require('otplib')
 var express = require('express')
 var router = express.Router()
@@ -42,9 +43,9 @@ router.post('/emailexists', userController.emailVerify)
 
 // Proceed to checkout
 router.get('/address', userController.isLogin, userController.savedAddressget)
-router.post('/address', userController.deliveryAddressPost)
+router.post('/address', userController.placeOrderPost)
 router.get('/savedAddress', userController.isLogin, cartController.cartCount, userController.deliveryAddress)
-router.post('/savedAddress', userController.savedAddressPost)
+router.post('/savedAddress', userController.placeOrderPost)
 router.get('/editSavedAddress/:id', cartController.cartCount, userController.editSavedAddress)
 router.post('/editSavedAddress/:id', userController.editSavedAddressPost)
 router.delete('/deleteAddress/:id', userController.deleteAddress)
@@ -74,8 +75,10 @@ router.patch('/addressEdit', userController.addressEdit)
 router.post('/update-user-password', userController.confirmAndUpdatePassword)
 
 //Search control
-router.get('/shop/search/suggestions/',userController.search)
-router.get('/search',userController.searching)
+// router.get('/shop/search/suggestions/',userController.search)
+// router.get('/search',userController.searching)
+router.get('/api/search', productController.searchProduct)
+  
 
 //middleware for preventing loading for strangers
 function userauth(req, res, next) {

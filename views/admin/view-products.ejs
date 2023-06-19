@@ -13,7 +13,8 @@
     }
   </style>
   <%- include('../partials/admin/adminHeader.ejs') %>
-  <h2 style="text-align: center; color: #567086; margin-top: 10px;">PRODUCT MANAGEMENT</h2>
+    <h2 style="text-align: center; color: #567086; margin-top: 10px;">PRODUCT MANAGEMENT</h2>
+
     <body id="reportsPage">
       <% if (msg) { %>
         <div id="notification" class="alert alert-success alert-dismissible fade show" role="alert">
@@ -73,7 +74,7 @@
                               <div style="display: flex;">
                                 <a href="/admin/edit-product/<%= item._id %>">
                                   <button class="edit-button-style fas fa-edit tm-product-edit-icon"></button></a>
-                                <form action="/admin/deleteProduct/<%#=item._id%>?_method=DELETE" method="POST"
+                                <form action="/admin/deleteProduct/<%=item._id%>?_method=DELETE" method="POST"
                                   style="display: inline-block">
                                   <a href="#" class="tm-product-delete-link">
                                     <i class="far fa-trash-alt tm-product-delete-icon"
@@ -95,28 +96,27 @@
                   <div class="tm-product-table-container">
                     <table class="table tm-table-small tm-product-table">
                       <tbody>
-                        <% categories.forEach((item)=> {
-                          if (!item.delete) { // Exclude categories with deleted field set to true
-                          %>
-                          <tr>
-                            <td class="tm-product-name">
-                              <%= item.category %>
-                            </td>
-                            <td class="text-center">
-                              <a href="/admin/edit-category/<%= item._id %>">
-                                <button class="edit-button-style fas fa-edit tm-product-edit-icon"></button>
-                              </a>
-                            </td>
-                            <td class="text-center">
-
-                              <a href="#" class="tm-product-delete-link">
-                                <i class="far fa-trash-alt tm-product-delete-icon"
-                                  onclick="categoryDelete('<%= item.category %>', '<%= item._id %>')"></i>
-                              </a>
-
-                            </td>
-                          </tr>
-                          <% } }) %>
+                        <% categories.forEach((item)=> { %>
+                          <% if (item.delete==false) { %>
+                            <tr>
+                              <td class="tm-product-name">
+                                <%= item.category %>
+                              </td>
+                              <td class="text-center">
+                                <a href="/admin/edit-category/<%= item._id %>">
+                                  <button class="edit-button-style fas fa-edit tm-product-edit-icon"></button>
+                                </a>
+                              </td>
+                              <td class="text-center">
+                                <form action="/admin/deleteCategory/<%= item._id %>?_method=DELETE" method="POST">
+                                <a href="#" class="tm-product-delete-link">
+                                  <i class="far fa-trash-alt tm-product-delete-icon"
+                                    onclick="categoryDelete('<%= item.category %>', '<%= item._id %>')"></i>
+                                </a>
+                                </form>
+                              </td>
+                            </tr>
+                            <% } }) %>
                       </tbody>
                     </table>
                   </div>
@@ -185,7 +185,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-              <form action="/admin/deleteCategory/${catId}?_method=DELETE" method="POST">
+              <form action=/admin/deleteCategory/${catId}?_method=DELETE" method="POST">
                 <button type="submit" class="btn btn-danger">Yes, Soft Delete</button>
               </form>
             </div>
@@ -198,7 +198,7 @@
           // Show the modal
           $('#categoryDeleteModal').modal('show');
         }
-
+        
         $(document).ready(function () {
           $("#tableid").DataTable();
         });

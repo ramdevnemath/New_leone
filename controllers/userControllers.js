@@ -180,7 +180,7 @@ exports.userSingleProduct = async (req, res) => {
     let objId = new ObjectId(id);
 
     let singleProduct = await Product.findOne({ _id: objId }).populate('category');
-    console.log(singleProduct,'single product');
+    console.log(singleProduct, 'single product');
     let proid = new ObjectId(singleProduct.category);
     const categoryInfo = await Category.aggregate([
       {
@@ -191,12 +191,12 @@ exports.userSingleProduct = async (req, res) => {
     ]);
     let categoryName = categoryInfo[0].category;
     const offer = await Offer.find({ category: categoryName });
-    if(offer.length > 0) {
+    if (offer.length > 0) {
       var discountedPrice = Math.floor(singleProduct.price - (singleProduct.price * offer[0].discount / 100))
     } else {
       var discountedPrice = 0;
     }
-    
+
 
     res.render("users/single-product", {
       footer: true,
@@ -440,7 +440,7 @@ exports.deliveryAddress = async (req, res) => {
 };
 
 
-exports.deliveryAddressPost = async (req, res) => {
+exports.placeOrderPost = async (req, res) => {
   let orders = req.body;
   let cod = req.body["payment-method"];
   let myCoupon = req.body.couponAmount;
@@ -505,7 +505,7 @@ exports.deliveryAddressPost = async (req, res) => {
         },
       },
     ]);
-    
+
     let status = req.body["payment-method"] === "COD" ? "placed" : "pending";
 
     let orderObj = new Order({
@@ -526,7 +526,7 @@ exports.deliveryAddressPost = async (req, res) => {
       products: cart.products,
       totalAmount: total[0].totalWithTax,
       paymentstatus: status,
-       
+
       deliverystatus: "not shipped",
       createdAt: new Date(),
     });
@@ -794,18 +794,18 @@ exports.paymentVerify = async (req, res) => {
 
     if (hmac === details["payment[razorpay_signature]"]) {
 
-      let transactionId = String(details["payment[razorpay_payment_id]"]);
-      console.log(transactionId,"transactionId")
+      var transactionId = String(details["payment[razorpay_payment_id]"]);
+      console.log(transactionId, "transactionId❤️❤️❤️❤️❤️❤️❤️❤️")
 
-      let order = await Order.updateOne(
-        { _id: orderObjId },
+      const order = await Order.updateOne(
+        { _id: orderObjId }, // Update the specific product within the order
         {
           $set: {
-            paymentstatus: "placed"
+            transactionId: transactionId, // Update the transactionId field for the product
+            paymentstatus: "placed", // Update the paymentstatus field
           },
         }
       );
-
       res.json({ status: true });
     } else {
       await Order.updateOne(
@@ -918,31 +918,13 @@ exports.search = async (req, res) => {
   }
 };
 
-exports.searching = async (req, res) => {
-  try {
-    // Get the search query from the request
-    const query = req.query.query;
-
-    // Perform the search operation (e.g., querying a database)
-    const searchProducts = await Product.find({ name: query });
-    console.log(searchProducts, "done");
-    // Return the results as JSON
-    res.json(searchProducts);
-    console.log("sended");
-  } catch (error) {
-    // Handle any errors that occurred during the search
-    console.error(error);
-    res.status(500).json({ error: 'An error occurred during the search.' });
-  }
-};
-
 exports.mensPage = async (req, res) => {
   try {
     const category = await Category.findOne({ category: "Men's" });
     // const catId = category._id;
-    console.log(category,"cat")
+    console.log(category, "cat")
     const products = await Product.find({ category: category }) // Convert the query result to plain JavaScript objects
-    console.log(products,"products")
+    console.log(products, "products")
     // Get the filter parameters from the request
     const { price, company, type } = req.query;
 
@@ -967,10 +949,10 @@ exports.mensPage = async (req, res) => {
 
 exports.womensPage = async (req, res) => {
   try {
-    const category = await Category.findOne({category: "Women's"})
+    const category = await Category.findOne({ category: "Women's" })
     const catId = category._id
-    const products = await Product.find({category: catId})
-    res.render('users/women', {products})
+    const products = await Product.find({ category: catId })
+    res.render('users/women', { products })
   } catch (error) {
     console.error(error)
   }
@@ -978,10 +960,10 @@ exports.womensPage = async (req, res) => {
 
 exports.kidsPage = async (req, res) => {
   try {
-    const category = await Category.findOne({category: "Kid's"})
+    const category = await Category.findOne({ category: "Kid's" })
     const catId = category._id
-    const products = await Product.find({category: catId})
-    res.render('users/kid', {products})
+    const products = await Product.find({ category: catId })
+    res.render('users/kid', { products })
   } catch (error) {
     console.error(error)
   }
@@ -989,9 +971,9 @@ exports.kidsPage = async (req, res) => {
 
 exports.filterProducts = async (req, res) => {
   try {
-    
+
     const { price, company, types, category } = req.body;
-    console.log(req.body,"💕💕💕")
+    console.log(req.body, "💕💕💕")
     // Build the filter object based on the provided criteria
     const filter = {};
 
@@ -1012,7 +994,7 @@ exports.filterProducts = async (req, res) => {
       filter.type = { $in: types };
     }
 
-    console.log(filter,"❤️❤️");
+    console.log(filter, "❤️❤️");
 
     // Retrieve the filtered products from the database
     const cat = await Category.findOne({ category: category });

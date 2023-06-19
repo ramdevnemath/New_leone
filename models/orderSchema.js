@@ -35,9 +35,6 @@ const orderSchema = new mongoose.Schema({
       orderstatus: {
         type: String,
       },
-      transactionId: {
-        type: String,
-      },
       deliverystatus: {
         type: String,
       },
@@ -46,6 +43,7 @@ const orderSchema = new mongoose.Schema({
   //   tax: { type: Number, required: true },
   //   couponDiscount: { type: Number },
   totalAmount: { type: Number, required: true },
+  transactionId: { type: String },
   paymentstatus: { type: String, required: true },
   deliverystatus: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },

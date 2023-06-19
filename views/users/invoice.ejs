@@ -1,4 +1,3 @@
-
 <body>
   <div class="">
     <div class="hero-wrap hero-bread" class="" style="background-image: url('/user/img/banner/banner-bg.jpg');">
@@ -25,6 +24,9 @@
               <p><%= element.deliveryDetails.town %></p>
               <p><%= element.deliveryDetails.state %></p>
               <p><%= element.deliveryDetails.zip %></p>
+              <% if (element.paymentMethod == "RazorPay") { %>
+                <h6>Tansaction ID: <%= element.transactionId %></h6>
+              <% } %>
             </div>
           <% }) %>
         </div>

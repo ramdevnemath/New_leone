@@ -1,3 +1,13 @@
+<style>
+	.suggestion-item {
+		padding: 10px;
+		border-bottom: 3px solid #ccc;
+	}
+
+	.suggestion-item:last-child {
+		border-bottom: 3px solid #ccc;
+	}
+</style>
 <!-- Start Header Area -->
 <header class="header_area sticky-header">
 	<div class="main_menu">
@@ -63,10 +73,12 @@
 										</ul>
 									</li>
 									<% if(locals.user) { %>
-										<li class="nav-item"><a class="nav-link" href="/profile"><%= user.name %></a></li>
-									<% } else { %>
-										<li class="nav-item"><a class="nav-link" href="/login">My Account</a></li>
-									<% } %>
+										<li class="nav-item"><a class="nav-link" href="/profile">
+												<%= user.name %>
+											</a></li>
+										<% } else { %>
+											<li class="nav-item"><a class="nav-link" href="/login">My Account</a></li>
+											<% } %>
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
 						<li class="nav-item"><a href="/cart" class="cart"><span class="ti-bag"></span></a></li>
@@ -80,12 +92,77 @@
 	</div>
 	<div class="search_input" id="search_input_box">
 		<div class="container">
-			<form class="d-flex justify-content-between">
-				<input type="text" class="form-control" id="search_input" placeholder="Search Here">
+			<form class="d-flex justify-content-between" id="search-form" action="/api/search" method="GET">
+				<input type="text" class="form-control" id="search_input" name="query" placeholder="Search Here">
 				<button type="submit" class="btn"></button>
 				<span class="lnr lnr-cross" id="close_search" title="Close Search"></span>
 			</form>
 		</div>
 	</div>
+	<br><br>
+	<div style="margin-left: 25%; margin-right: 25%; width: 50%; border: none; background-color: rgb(255, 255, 255);" id="search-suggestions"></div>
+	<!-- <div id="search-results"></div> -->
 </header>
+
 <!-- End Header Area -->
+
+<script>
+	// Get the search form element
+	const searchForm = document.getElementById('search-form');
+	// Get the search suggestions container
+	const searchSuggestionsContainer = document.getElementById('search-suggestions');
+
+	// Add event listener to form submission
+	searchForm.addEventListener('submit', function (event) {
+		event.preventDefault(); // Prevent the form from submitting normally
+
+		// Get the search query value
+		const searchInput = document.getElementById('search_input');
+		const query = searchInput.value;
+
+		// Send an AJAX request to your product search endpoint
+		const xhr = new XMLHttpRequest();
+		xhr.open('GET', '/api/search?query=' + query, true);
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+				// Handle the response and display the search suggestions or search results
+				const searchResults = JSON.parse(xhr.responseText);
+				if (searchResults.length > 0) {
+					// Display the search suggestions
+					displaySearchSuggestions(searchResults);
+				} else {
+					// No suggestions found, display "No results found" message
+					searchSuggestionsContainer.innerHTML = 'No results found.';
+				}
+			}
+		};
+		xhr.send();
+	});
+
+	// Function to display the search suggestions
+	function displaySearchSuggestions(suggestions) {
+		searchSuggestionsContainer.innerHTML = '';
+
+		// Loop through the suggestions and create HTML elements
+		suggestions.forEach(function (suggestion) {
+			const suggestionLink = document.createElement('a');
+			suggestionLink.textContent = suggestion.productName;
+			suggestionLink.href = `/single-product/${suggestion._id}`; // Replace with the appropriate product ID property
+
+			const suggestionItem = document.createElement('div');
+			suggestionItem.classList.add('suggestion-item');
+			suggestionItem.appendChild(suggestionLink);
+
+			searchSuggestionsContainer.appendChild(suggestionItem);
+		});
+
+		// Add event listener to the document click event
+		document.addEventListener('click', function (event) {
+			const isClickInsideSuggestions = searchSuggestionsContainer.contains(event.target);
+			if (!isClickInsideSuggestions) {
+				// Click is outside the suggestions container, hide or remove the suggestions
+				searchSuggestionsContainer.innerHTML = '';
+			}
+		});
+	}
+</script>

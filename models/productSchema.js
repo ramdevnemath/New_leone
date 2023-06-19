@@ -40,6 +40,8 @@ const productSchema = new Schema({
     }
 })
 
+productSchema.index({ productName: 'text' });
+
 //model name: "Product" will be used to turn into a collection name in DB
 //"Product" => 'product' + 's' => products
 module.exports = mongoose.model('Product',productSchema)

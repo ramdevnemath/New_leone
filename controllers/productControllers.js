@@ -186,3 +186,14 @@ exports.postEditCategory = async (req, res) => {
         console.log(error)
     }
 }
+
+exports.searchProduct = async (req, res) => {
+  const query = req.query.query;
+
+  try {
+    const searchResults = await Product.find({ $text: { $search: query } });
+    res.json(searchResults);
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while searching for products' });
+  }
+};
