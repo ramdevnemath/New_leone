@@ -847,8 +847,7 @@ exports.userProfile = async (req, res) => {
 
   // Access cartCount value from req object
   const cartCount = req.cartCount;
-  const address = addressData[0].address;
-  if (addressData.length > 0 && addressData) {
+  const address = addressData.length > 0 ? addressData[0].address : null
 
     res.render("users/userprofile", {
       address,
@@ -857,9 +856,7 @@ exports.userProfile = async (req, res) => {
       cartCount,
       balance,
     });
-  } else {
-    res.redirect('/address')
-  }
+
 };
 
 exports.editUserProfile = async (req, res) => {
