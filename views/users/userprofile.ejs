@@ -257,20 +257,20 @@
 
 
                         <div class="tab-pane fade " id="address" role="tabpanel">
-                            <p>
-                                <button class="btn btn-outline-primary ml-3" id="toggle-button-address" type="button">
+                            <!-- <p>
+                                <button class="btn primary-btn ml-3" id="toggle-button-address" type="button">
                                     + Add new Address
                                 </button>
-                            </p>
+                            </p> -->
                             <div class="card ml-3" id="card-address" style="display: none;">
                                 <div class="card-header">
                                     <h5 class="card-title mb-0">Add Address</h5>
                                 </div>
                                 <div class="card-body">
-                                    <form action="#" id="profile-form">
+                                    <form action="/savedAddress" id="profile-form" method="post">
                                         <div class="mb-3">
                                             <label class="form-label" for="inputEmail4">Name*</label>
-                                            <input type="text" class="form-control" name="name" placeholder="">
+                                            <input type="text" class="form-control" name="firstname" placeholder="">
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label" for="inputEmail4">Mobile*</label>
@@ -279,14 +279,14 @@
                                         <div class="mb-3">
                                             <label class="form-label" for="inputAddress">Address (House No, Building,
                                                 Street, Area)*</label>
-                                            <input type="text" class="form-control" name="addressDetails"
+                                            <input type="text" class="form-control" name="streetaddress"
                                                 placeholder="">
                                         </div>
 
                                         <div class="row">
                                             <div class="mb-3 col-md-6">
                                                 <label class="form-label" for="inputCity">City*</label>
-                                                <input type="text" class="form-control" name="city">
+                                                <input type="text" class="form-control" name="town">
                                             </div>
                                             <div class="mb-3 col-md-4">
                                                 <label class="form-label" for="inputState">State*</label>
@@ -301,7 +301,7 @@
                                                 <div>
                                                     <label class="form-check form-check-inline">
                                                         <input class="form-check-input" type="radio"
-                                                            name="typeOfAddress" value="Home">
+                                                            name="radio" value="Home">
                                                         <span class="form-check-label">
                                                             Home
                                                         </span>
@@ -326,10 +326,16 @@
                             <br>
                             <div id="abc" class="col-md-10">
                                 <% if (address != null) { %>
+<<<<<<< HEAD
                                  
                                     <% address.forEach ( element=> { %>
                                         <div class="card">
                                             <div class="card-header">
+=======
+                                <% address.forEach ( element=> { %>
+                                    <div class="card">
+                                        <div class="card-header">
+>>>>>>> 46219b36362a1f125b5e349f87ad27daa1bfe261
                                             <h5 class="card-title mb-0">Address</h5>
                                         </div>
 
@@ -418,8 +424,14 @@
                                     </div>
                                     <br>
                                     <% }) %>
+<<<<<<< HEAD
 
                                     <% } %>
+=======
+                                    <% } else { %>
+                                        <div><span>No addresses found</span></div>
+                                        <% } %>
+>>>>>>> 46219b36362a1f125b5e349f87ad27daa1bfe261
                                         <div id="ds"></div>
                                         <br><br>
 
@@ -468,7 +480,7 @@
             $("#profile-form").validate({
                 rules: {
 
-                    name: {
+                    firstname: {
                         required: true,
                         minlength: 3
 
@@ -478,22 +490,22 @@
                         minlength: 9
 
                     },
-                    addressDetails: {
-                        required: true
-                    },
-                    city: {
-                        required: true
+                    // addressDetails: {
+                    //     required: true
+                    // },
+                    // city: {
+                    //     required: true
 
-                    },
-                    state: {
-                        required: true
-                    },
-                    zip: {
-                        required: true
-                    },
-                    typeOfAddress: {
-                        required: true
-                    }
+                    // },
+                    // state: {
+                    //     required: true
+                    // },
+                    // zip: {
+                    //     required: true
+                    // },
+                    // typeOfAddress: {
+                    //     required: true
+                    // }
 
                 },
                 messages: {
@@ -548,101 +560,101 @@
             });
         });
 
-        $("#profile-form").submit((e) => {
-            e.preventDefault()
-            $.ajax({
-                url: '/address',
-                method: 'PATCH',
-                data: $('#profile-form').serialize(),
-                success: (address) => {
-                    $("#profile-form").trigger("reset");
-                    console.log(address, 'first value')
-                    let l = address.address.length
-                    console.log(l, 'length')
-                    const value = address.address[l - 1];
-                    const card = `
-                      <div class="card">
-                          <div class="card-header">
-                              <h5 class="card-title mb-0">Address</h5>
-                          </div> 
-                          <div class="card-body">
+        // $("#profile-form").submit((e) => {
+        //     e.preventDefault()
+        //     $.ajax({
+        //         url: '/savedAddress',
+        //         method: 'POST',
+        //         data: $('#profile-form').serialize(),
+        //         success: (address) => {
+        //             $("#profile-form").trigger("reset");
+        //             console.log(address, 'first value')
+        //             let l = address.address.length
+        //             console.log(l, 'length')
+        //             const value = address.address[l - 1];
+        //             const card = `
+        //               <div class="card">
+        //                   <div class="card-header">
+        //                       <h5 class="card-title mb-0">Address</h5>
+        //                   </div> 
+        //                   <div class="card-body">
                               
-                                  <div class="row">
-                                      <div class="col-md-8">
-                                           <div class="tab-content">
-                                                  <div class="tab-pane active" id="tab_default_1">
-                                                          <span class="text-right"> ${value.radio
-                        }</span>
-                                                                  <address>
-                                                                      <div>${value.firstname
-                        } </div>
-                                                                      <div>${value.mobile
-                        }</div>
-                                                                      <div>${value.streetaddress
-                        }</div>
-                                                                      <div>${value.town
-                        }</div>
-                                                                      <div> ${value.state
-                        }</div>
-                                                                      <div> ${value.zip
-                        }</div>
-                                                                  </address>
-                                                  </div>
-                                            </div>
-                                      </div>
-                                  </div>
-                                    <button type="button" class="btn btn-primary">Edit</button>
-                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" id="deleteButton" data-bs-target="#deleteModal${value._id
-                        }">
-                                                  Delete
-                                              </button>
-                                              <div class="modal fade" style="margin-top: 25vh;" tabindex="-1" role="dialog"
-                                                  id="deleteModal${value._id
-                        }">
-                                                  <div class="modal-dialog" role="document">
-                                                      <div class="modal-content">
-                                                          <div class="modal-header">
-                                                              <div class="modal-title">
-                                                                  You are about to remove an address record.
-                                                              </div>
-                                                              <button type="button" class="btn-close"
-                                                                  data-bs-dismiss="modal" aria-label="Close"></button>
-                                                          </div>
-                                                          <div class="modal-body">
-                                                              <p>
-                                                                  This will remove the
-                                                                  <b class="fw-bold">
+        //                           <div class="row">
+        //                               <div class="col-md-8">
+        //                                    <div class="tab-content">
+        //                                           <div class="tab-pane active" id="tab_default_1">
+        //                                                   <span class="text-right"> ${value.radio
+        //                 }</span>
+        //                                                           <address>
+        //                                                               <div>${value.firstname
+        //                 } </div>
+        //                                                               <div>${value.mobile
+        //                 }</div>
+        //                                                               <div>${value.streetaddress
+        //                 }</div>
+        //                                                               <div>${value.town
+        //                 }</div>
+        //                                                               <div> ${value.state
+        //                 }</div>
+        //                                                               <div> ${value.zip
+        //                 }</div>
+        //                                                           </address>
+        //                                           </div>
+        //                                     </div>
+        //                               </div>
+        //                           </div>
+        //                             <button type="button" class="btn btn-primary">Edit</button>
+        //                             <button type="button" class="btn btn-danger" data-bs-toggle="modal" id="deleteButton" data-bs-target="#deleteModal${value._id
+        //                 }">
+        //                                           Delete
+        //                                       </button>
+        //                                       <div class="modal fade" style="margin-top: 25vh;" tabindex="-1" role="dialog"
+        //                                           id="deleteModal${value._id
+        //                 }">
+        //                                           <div class="modal-dialog" role="document">
+        //                                               <div class="modal-content">
+        //                                                   <div class="modal-header">
+        //                                                       <div class="modal-title">
+        //                                                           You are about to remove an address record.
+        //                                                       </div>
+        //                                                       <button type="button" class="btn-close"
+        //                                                           data-bs-dismiss="modal" aria-label="Close"></button>
+        //                                                   </div>
+        //                                                   <div class="modal-body">
+        //                                                       <p>
+        //                                                           This will remove the
+        //                                                           <b class="fw-bold">
   
-                                                                      ${value.radio} Address
-                                                                  </b><br />
-                                                                  Are you sure?
-                                                              </p>
-                                                          </div>
+        //                                                               ${value.radio} Address
+        //                                                           </b><br />
+        //                                                           Are you sure?
+        //                                                       </p>
+        //                                                   </div>
   
-                                                          <div class="modal-footer">
-                                                              <button type="button" class="btn btn-secondary"
-                                                                  data-bs-dismiss="modal">
-                                                                  Close
-                                                              </button>
-                                                              <form action="/address/${value._id}?_method=DELETE"
-                                                                  method="post" class="position-relative">
-                                                                  <button type="submit" class="btn btn-primary">
-                                                                      Yes, Remove Address
-                                                                  </button>
-                                                              </form>
-                                                          </div>
-                                                      </div>
-                                                  </div>
-                                              </div>
+        //                                                   <div class="modal-footer">
+        //                                                       <button type="button" class="btn btn-secondary"
+        //                                                           data-bs-dismiss="modal">
+        //                                                           Close
+        //                                                       </button>
+        //                                                       <form action="/address/${value._id}?_method=DELETE"
+        //                                                           method="post" class="position-relative">
+        //                                                           <button type="submit" class="btn btn-primary">
+        //                                                               Yes, Remove Address
+        //                                                           </button>
+        //                                                       </form>
+        //                                                   </div>
+        //                                               </div>
+        //                                           </div>
+        //                                       </div>
   
-                           </div>
+        //                    </div>
   
-                       </div>`;
-                    $('#ds').append(card);
-                }
+        //                </div>`;
+        //             $('#ds').append(card);
+        //         }
 
-            })
-        })
+        //     })
+        // })
         $(document).ready(function () {
             $("#toggle-button-address").click(function () {
                 $("#card-address").toggle();

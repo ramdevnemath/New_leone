@@ -864,6 +864,10 @@ exports.userProfile = async (req, res) => {
   // Access cartCount value from req object
   const cartCount = req.cartCount;
   const address = addressData.length > 0 ? addressData[0].address : null
+<<<<<<< HEAD
+=======
+
+>>>>>>> 46219b36362a1f125b5e349f87ad27daa1bfe261
     res.render("users/userprofile", {
       address,
       userDetails,
@@ -871,6 +875,7 @@ exports.userProfile = async (req, res) => {
       cartCount,
       balance,
     });
+<<<<<<< HEAD
 };
 
 exports.updateUserAddress = async (req, res) => {
@@ -895,6 +900,9 @@ exports.updateUserAddress = async (req, res) => {
   );
   console.log(address, "address");
   res.json(address);
+=======
+
+>>>>>>> 46219b36362a1f125b5e349f87ad27daa1bfe261
 };
 
 exports.editUserProfile = async (req, res) => {

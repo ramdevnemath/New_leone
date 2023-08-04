@@ -7,7 +7,7 @@ exports.orderPlacedCod = (req, res) => {
   let user = req.session.user;
 
   try {
-    res.render("users/OrderPlacedCod", { user, cartIcon: true });
+    res.render("users/orderPlacedCod", { user, cartIcon: true });
   } catch (error) {
     console.log(error);
     res.status(500).send("Internal Server Error");
