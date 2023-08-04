@@ -42,10 +42,10 @@ router.get('/checkLogin', cartController.checkLogin)
 router.post('/emailexists', userController.emailVerify)
 
 // Proceed to checkout
-router.get('/address', userController.isLogin, userController.savedAddressget)
-router.post('/address', userController.placeOrderPost)
-router.get('/savedAddress', userController.isLogin, cartController.cartCount, userController.deliveryAddress)
-router.post('/savedAddress', userController.placeOrderPost)
+router.get('/address', userController.deliveryAddress)
+router.post('/address', userController.deliveryAddressPost)
+router.get('/savedAddress', userController.isLogin, cartController.cartCount, userController.savedAddressget)
+router.post('/savedAddress', userController.savedAddressPost)
 router.get('/editSavedAddress/:id', cartController.cartCount, userController.editSavedAddress)
 router.post('/editSavedAddress/:id', userController.editSavedAddressPost)
 router.delete('/deleteAddress/:id', userController.deleteAddress)
@@ -73,6 +73,7 @@ router.get('/profile', userController.isLogin, cartController.cartCount, userCon
 router.patch('/profile/:id', userController.editUserProfile)
 router.patch('/addressEdit', userController.addressEdit)
 router.post('/update-user-password', userController.confirmAndUpdatePassword)
+router.patch('/address', userController.updateUserAddress)
 
 //Search control
 // router.get('/shop/search/suggestions/',userController.search)

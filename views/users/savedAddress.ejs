@@ -12,34 +12,32 @@
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
   }
 </style>
-<body>
-<div class="">
-  <div class="hero-wrap hero-bread" class="" style="background-image: url('user/img/banner/banner-bg.jpg');">
-    <div class="container">
-      <div class="row no-gutters slider-text align-items-center justify-content-center">
-        <div style="height: 200px;" class="col-md-9 ftco-animate text-center">
-        </div>
-      </div>
-    </div>
-  </div>
 
-</div>
-<section class="ftco-section">
-  <br>
+<section class="banner-area organic-breadcrumb">
   <div class="container">
-    <div class="row justify-content-center">
-      <!-- Message with location icon -->
-      <div id="saved-addresses-message" class="text-right mb-3">
-        <div class="text-center">
-          <i class="fas fa-map-marker-alt"></i>
-          <span class="d-block text-center"></span>
-        </div>
-        <h2 class="fw-normal mb-0 text-black">DELIVERY ADDRESS</h2>
+      <div class="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-end">
+          <div class="col-first">
+              <h1>Change / Add Address</h1>
+          </div>
       </div>
-      <div class="row justify-content-end col-md-12 text-right mb-3">
+  </div>
+</section>
+<br>
+<section class="ftco-section">
+  <div class="container">
+    <div class="row">
+      <!-- Message with location icon -->
+      <div class="row col-md-12 mb-3" style="display: flex">
+        <div class="col-md-12">
+          <a href="/address"><button class="btn primary-btn" id="#">Back to Checkout</button></a>
+        </div>
+      </div>
+      <div class="row justify-content-end col-md-12 mb-3">
+        <div class="col-md-12">
+          <button class="btn primary-btn" id="add-new-address">Add New Address</button>
+        </div>
       </div>
 
-        
       <div class="col-xl-10 ftco-animate">
         <form action="#" id="checkout-form" class="billing-form" style="background-color: #fdfbfb; padding: 20px;">
           <h3 class="mb-4 billing-heading">ADD NEW ADDRESS</h3>
@@ -138,71 +136,60 @@
 
 <div class="container" id="address-list">
   <div class="row">
-    <% for (let i = 0; i < address.length; i++) { %>
-    <div class="col-sm-12 col-md-8 offset-md-2">
-      <div class="card mx-auto w-100 card-hover-shadow mb-4" style="max-width: 100% !important;">
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-12">
-              <div class="form-check">
-                <input class="form-check-input" style="position: relative; z-index: 10;" type="radio"
-                  name="address" id="address<%= i %>" value="<%= address[i]._id %>" <% if (i==0) { %> checked <% } %>>
+    <% for (let i=0; i < address.length; i++) { %>
+      <div class="col-sm-12 col-md-8 offset-md-2">
+        <div class="card mx-auto w-100 card-hover-shadow mb-4" style="max-width: 100% !important;">
+
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-8">
+                <h5 class="card-title mb-1">
+                  <%= `${address[i].firstname} ${address[i].lastname}` %>
+                </h5>
+                <p class="card-text mb-1">
+                  <%= address[i].streetaddress %>
+                </p>
+                <p class="card-text mb-1">
+                  <%= address[i].appartment %>
+                </p>
+                <p class="card-text mb-1">
+                  <%= address[i].state %>
+                </p>
+                <p class="card-text mb-1">
+                  <%= address[i].town %>
+                </p>
+                <p class="card-text mb-0">
+                  <%= address[i].zip %>
+                </p>
+                <p class="card-text mt-1 mb-0">Phone: +91 <%= address[i].mobile %>
+                </p>
+              </div>
+              <div class="col-md-4 text-md-right">
+                <a href="/editSavedAddress/<%= address[i]._id %>" class="btn btn-link btn-lg">Edit</a>
+                <a href="#" class="btn btn-link btn-lg text-danger"
+                  onclick="deleteAddress('<%= address[i]._id %>')">Delete</a>
+
               </div>
             </div>
-            <div class="col-md-8">
-              <h5 class="card-title mb-1">
-                <%= `${address[i].firstname} ${address[i].lastname}` %>
-              </h5>
-              <p class="card-text mb-1">
-                <%= address[i].streetaddress %>
-              </p>
-              <p class="card-text mb-1">
-                <%= address[i].appartment %>
-              </p>
-              <p class="card-text mb-1">
-                <%= address[i].state %>
-              </p>
-              <p class="card-text mb-1">
-                <%= address[i].town %>
-              </p>
-              <p class="card-text mb-0">
-                <%= address[i].zip %>
-              </p>
-              <p class="card-text mt-1 mb-0">Phone: +91 <%= address[i].mobile %></p>
-            </div>
-            <div class="col-md-4 text-md-right">
-              <a href="/editSavedAddress/<%= address[i]._id %>" class="btn btn-outline-warning btn-sm">Edit</a>
-              <a href="#" class="btn btn-outline-danger btn-sm" onclick="deleteAddress('<%= address[i]._id %>')">Delete</a>
-            </div>
           </div>
-        </div>
-      </div>
-    </div>
-    <% } %>
-    <% if(address.length) { %>
-      <div class="col-sm-12 col-md-8 offset-md-2">
-        <div class="row justify-content-end">
-          <div class="col-md-12 text-right mb-3">
-            <a href="/savedAddress" class="btn btn-outline-warning btn-block" id="">Proceed</a>
-          </div>
+
         </div>
       </div>
       <% } %>
-    <div class="col-sm-12 col-md-8 offset-md-2">
-      <div class="row justify-content-end">
-        <div class="col-md-12 text-right mb-3">
-          <button class="btn btn-outline-success btn-block" id="add-new-address">Add New Address</button>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
+
+
+
+
+
+
 
 
 <!-- JavaScript code -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-<script src="user/js/vendor/jquery-2.2.4.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   $(document).ready(function () {
     // Hide the form initially
@@ -320,11 +307,6 @@
         }
       });
   }
-
-  // Disable right-click context menu
-  document.addEventListener('contextmenu', function (event) {
-    event.preventDefault();
-  });
 
 
 </script>

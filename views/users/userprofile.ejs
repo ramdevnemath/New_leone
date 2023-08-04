@@ -325,14 +325,16 @@
                             </div>
                             <br>
                             <div id="abc" class="col-md-10">
-                                <% address.forEach ( element=> { %>
-                                    <div class="card">
-                                        <div class="card-header">
+                                <% if (address != null) { %>
+                                 
+                                    <% address.forEach ( element=> { %>
+                                        <div class="card">
+                                            <div class="card-header">
                                             <h5 class="card-title mb-0">Address</h5>
                                         </div>
 
                                         <div class="card-body">
-
+                                            
                                             <div class="row">
                                                 <div class="col-md-8">
                                                     <div class="tab-content">
@@ -368,11 +370,11 @@
 
 
                                             </div>
-
+                                            
                                             <!-- <button id="edit-button" type="button" class="btn btn-primary"  data-id="<%#= element._id %>">Edit</button> -->
-
+                                            
                                             <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
-                                                id="deleteButton" data-bs-target="#deleteModal<%=element._id%>">
+                                            id="deleteButton" data-bs-target="#deleteModal<%=element._id%>">
                                                 Delete
                                             </button>
                                             <div class="modal fade" style="margin-top: 25vh;" tabindex="-1"
@@ -399,7 +401,7 @@
 
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-secondary"
-                                                                data-bs-dismiss="modal">
+                                                            data-bs-dismiss="modal">
                                                                 Close
                                                             </button>
                                                             <form action="/address/<%=element._id%>?_method=DELETE"
@@ -417,6 +419,7 @@
                                     <br>
                                     <% }) %>
 
+                                    <% } %>
                                         <div id="ds"></div>
                                         <br><br>
 

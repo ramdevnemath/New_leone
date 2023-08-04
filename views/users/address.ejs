@@ -146,65 +146,66 @@
                 <div class="col-xl-10 ftco-animate">
                     <form action="#" id="checkout-form" class="billing-form"
                         style="background-color: #fdfbfb; padding: 20px;">
-                        <% if (address.length) { %>
+                        <% if (address != null) { %>
                             <div style="text-align: center;">
                                 <h3 class="mb-4 billing-heading">Delivery Address</h3>
                             </div>
                             <div class="row align-items-end">
                                 <div class="container" id="address-list">
                                     <div class="row">
-                                        <% for (let i=0; i < address.length; i++) { %>
-                                            <div class="col-sm-12 col-md-8 offset-md-2">
-                                                <div class="card mx-auto w-100 mb-4"
-                                                    style="max-width: 100% !important; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
-                                                    <div class="card-body">
-                                                        <div class="row">
-                                                            <div class="col-md-1">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" style="z-index: 10;"
-                                                                        type="radio" name="address" id="address<%= i %>"
-                                                                        value="<%= address[i]._id %>" <% if (i==0) { %>
-                                                                    checked <% } %>
-                                                                        >
+                                            <% for (let i=0; i < address.length; i++) { %>
+                                                <div class="col-sm-12 col-md-8 offset-md-2">
+                                                    <div class="card mx-auto w-100 mb-4"
+                                                        style="max-width: 100% !important; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                                                        <div class="card-body">
+                                                            <div class="row">
+                                                                <div class="col-md-1">
+                                                                    <div class="form-check">
+                                                                        <input class="form-check-input"
+                                                                            style="z-index: 10;" type="radio"
+                                                                            name="address" id="address<%= i %>"
+                                                                            value="<%= address[i]._id %>" <% if (i==0) {
+                                                                            %>
+                                                                        checked <% } %>
+                                                                            >
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                            <div class="col-md-7">
-                                                                <h5 class="card-title mb-1">
-                                                                    <%= `${address[i].firstname} ${address[i].lastname}`
-                                                                        %>
-                                                                </h5>
-                                                                <p class="card-text mb-1">
-                                                                    <%= address[i].streetaddress %>
-                                                                </p>
-                                                                <p class="card-text mb-1">
-                                                                    <%= address[i].appartment %>
-                                                                </p>
-                                                                <p class="card-text mb-1">
-                                                                    <%= address[i].state %>
-                                                                </p>
-                                                                <p class="card-text mb-1">
-                                                                    <%= address[i].town %>
-                                                                </p>
-                                                                <p class="card-text mb-0">
-                                                                    <%= address[i].zip %>
-                                                                </p>
-                                                                <p class="card-text mt-1 mb-0">Phone: +91 <%=
-                                                                        address[i].mobile %>
-                                                                </p>
+                                                                <div class="col-md-7">
+                                                                    <h5 class="card-title mb-1">
+                                                                        <%= `${address[i].firstname}
+                                                                            ${address[i].lastname}` %>
+                                                                    </h5>
+                                                                    <p class="card-text mb-1">
+                                                                        <%= address[i].streetaddress %>
+                                                                    </p>
+                                                                    <p class="card-text mb-1">
+                                                                        <%= address[i].appartment %>
+                                                                    </p>
+                                                                    <p class="card-text mb-1">
+                                                                        <%= address[i].state %>
+                                                                    </p>
+                                                                    <p class="card-text mb-1">
+                                                                        <%= address[i].town %>
+                                                                    </p>
+                                                                    <p class="card-text mb-0">
+                                                                        <%= address[i].zip %>
+                                                                    </p>
+                                                                    <p class="card-text mt-1 mb-0">Phone: +91 <%=
+                                                                            address[i].mobile %>
+                                                                    </p>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <% } %>
+                                                <% } %>
                                     </div>
                                 </div>
                             </div>
                             <% } %>
                                 <div class="d-flex justify-content-center mb-4">
-                                    <a onclick="window.history.back()"><button type="button" class="btn primary-btn"
-                                            id="add-address-btn">Go back and change
-                                            Address</button></a>
+                                    <a href="/savedAddress"><button type="button" class="btn primary-btn"
+                                            id="add-address-btn">Add address</button></a>
                                 </div>
 
                                 <section>
@@ -228,7 +229,8 @@
                                                 <p class="d-flex">
                                                     <span>Coupon Discount :</span>
                                                     <% if (locals.discountAmount) { %>
-                                                        <span>Coupon Discount :</span><span id="couponDiscount">&#8377; <%= locals.discountAmount %>
+                                                        <span>Coupon Discount :</span><span id="couponDiscount">&#8377;
+                                                            <%= locals.discountAmount %>
                                                         </span>
                                                         <% } else { %>
                                                             <span id="couponDiscount"></span>
@@ -240,18 +242,20 @@
                                                 <p class="d-flex total-price">
                                                     <span>Total :</span>
                                                     <% if (locals.discountAmount) { %>
-                                                            <% if (total[0].totalWithTax < locals.discountAmount) {
-                                                                %>
-                                                                <span id="taxWithTotal">&#8377;0</span>
-                                                                <% } else { %>
-                                                                    <span id="taxWithTotal">&#8377;<%= total[0].totalWithTax - locals.discountAmount %></span>
+                                                        <% if (total[0].totalWithTax < locals.discountAmount) { %>
+                                                            <span id="taxWithTotal">&#8377;0</span>
+                                                            <% } else { %>
+                                                                <span id="taxWithTotal">&#8377;<%= total[0].totalWithTax
+                                                                        - locals.discountAmount %></span>
+                                                                <% } %>
+                                                                    <span
+                                                                        style="color: green; margin-left: 10px;">Coupon
+                                                                        Applied</span>
+                                                                    <% } else { %>
+                                                                        <span id="taxWithTotal">&#8377; <%=
+                                                                                total[0].totalWithTax %>
+                                                                        </span>
                                                                         <% } %>
-                                                        <span style="color: green; margin-left: 10px;">Coupon
-                                                            Applied</span>
-                                                        <% } else { %>
-                                                            <span id="taxWithTotal">&#8377; <%= total[0].totalWithTax %>
-                                                            </span>
-                                                            <% } %>
                                                 </p>
 
 
@@ -562,10 +566,5 @@
 
 
             }
-
-            // Disable right-click context menu
-            document.addEventListener('contextmenu', function (event) {
-                event.preventDefault();
-            });
 
         </script>

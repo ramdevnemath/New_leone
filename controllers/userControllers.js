@@ -336,7 +336,7 @@ exports.deliveryAddress = async (req, res) => {
   userId = userId.toString();
 
   const addressData = await Address.find({ user: user._id });
-  const address = addressData[0].address;
+  const address = addressData.length > 0 ? addressData[0].address : null
 
   try {
     ;
@@ -440,27 +440,34 @@ exports.deliveryAddress = async (req, res) => {
 };
 
 
-exports.placeOrderPost = async (req, res) => {
+exports.deliveryAddressPost = async (req, res) => {
   let orders = req.body;
+  console.log(orders,"❤️❤️❤️❤️❤️");
   let cod = req.body["payment-method"];
-  let myCoupon = req.body.couponAmount;
-  myCoupon = myCoupon.replace("₹", "");
+  console.log(cod);
+
   let addressId = new mongoose.Types.ObjectId(req.body.address);
+
+  console.log(addressId);
 
   try {
     const addressDetails = await Address.findOne(
       { "address._id": addressId },
       { "address.$": 1 }
     );
+    console.log(addressDetails);
 
     let filteredAddress = addressDetails.address[0];
+    console.log(filteredAddress);
+    console.log(filteredAddress.firstname);
 
     let cart = await Cart.findOne({ userId: req.session.user._id });
     let userId = req.session.user._id;
+    console.log(cart, userId);
 
     let total = await Cart.aggregate([
       {
-        $match: { userId: req.session.user._id },
+        $match: { userId:req.session.user._id },
       },
       {
         $unwind: "$products",
@@ -468,10 +475,10 @@ exports.placeOrderPost = async (req, res) => {
       {
         $project: {
           item: { $toObjectId: "$products.item" },
+          quantity: "$products.quantity",
           size: "$products.size",
           currentPrice: "$products.currentPrice",
           tax: "$products.tax",
-          quantity: "$products.quantity",
         },
       },
       {
@@ -485,10 +492,10 @@ exports.placeOrderPost = async (req, res) => {
       {
         $project: {
           item: 1,
+          quantity: 1,
           size: 1,
           currentPrice: 1,
           tax: 1,
-          quantity: 1,
           productInfo: { $arrayElemAt: ["$productInfo", 0] },
         },
       },
@@ -502,10 +509,16 @@ exports.placeOrderPost = async (req, res) => {
               $multiply: ["$quantity", { $add: ["$tax", "$currentPrice"] }],
             },
           },
+          // total: { $sum: { $multiply: ["$quantity", "$productInfo.price"] } },
         },
       },
     ]);
 
+    console.log(cart.products, "nnnnnnnnnnnnnnnnnn");
+    // Store the total value in a session variable
+    // req.session.total = total[0].total;
+
+    console.log(total[0].totalWithTax, "cart got");
     let status = req.body["payment-method"] === "COD" ? "placed" : "pending";
 
     let orderObj = new Order({
@@ -526,68 +539,30 @@ exports.placeOrderPost = async (req, res) => {
       products: cart.products,
       totalAmount: total[0].totalWithTax,
       paymentstatus: status,
-
       deliverystatus: "not shipped",
       createdAt: new Date(),
     });
+    console.log(orderObj);
     let orderDoc = await Order.create(orderObj);
+    console.log(orderDoc, "order createad");
     let orderId = orderDoc._id;
     let orderIdString = orderId.toString();
+    console.log(orderIdString, "order string");
     // Find and delete the cart items for the user
     await Cart.findOneAndDelete({ userId: cart.userId });
-    let walletItems = await Wallet.findOne({ userId: req.session.user._id });
-    let balance;
-
-    if (walletItems) {
-      balance = walletItems.balance;
-    } else {
-      const newWallet = new Wallet({
-        userId: req.session.user._id,
-        balance: 0, // Set the initial balance to 0 or any other desired value
-      });
-      const savedWallet = await newWallet.save();
-      balance = savedWallet.balance;
-    }
-
     if (req.body["payment-method"] == "COD") {
       res.json({ codSuccess: true });
-
-
     } else if (req.body["payment-method"] == "RazorPay") {
-      if (myCoupon) {
-        var options = {
-          amount: (orderDoc.totalAmount - myCoupon) * 100, // amount in the smallest currency unit
-          currency: "INR",
-          receipt: orderIdString,
-        };
-      } else {
-        var options = {
-          amount: orderDoc.totalAmount * 100, // amount in the smallest currency unit
-          currency: "INR",
-          receipt: orderIdString,
-        };
-      }
-
+      console.log(orderDoc._id, "iddd of order");
+      var options = {
+        amount: orderDoc.totalAmount * 100, // amount in the smallest currency unit
+        currency: "INR",
+        receipt: orderIdString,
+      };
       instance.orders.create(options, function (err, order) {
+        console.log(order, "new order");
         res.json(order);
       });
-
-
-
-    } else if (req.body["payment-method"] == "Wallet") {
-      if (total[0].totalWithTax <= balance) {
-        // Check if wallet balance is sufficient for the purchase
-        // Deduct the purchase amount from the wallet balance
-        balance -= total[0].totalWithTax;
-        walletItems.balance = balance;
-        await walletItems.save();
-
-        console.log("Order placed using wallet payment");
-        res.json({ codSuccess: true });
-      } else if (total[0].total > balance) {
-        console.log("Insufficient funds in wallet");
-        res.json({ emptyWallet: true });
-      }
     }
   } catch (error) {
     console.log(error);
@@ -636,16 +611,17 @@ exports.savedAddressget = async (req, res) => {
   let user = req.session.user;
   let userId = req.session.user._id;
   userId = userId.toString();
+  console.log(user, "user here");
 
   const cartCount = req.cartCount;
   const addressData = await Address.find({ user: user._id });
 
   if (addressData && addressData.length > 0) {
     const address = addressData[0].address;
+    console.log(address, "address got");
 
     try {
       res.render("users/savedAddress", {
-        footer: true,
         user,
         cartCount,
         address,
@@ -657,7 +633,6 @@ exports.savedAddressget = async (req, res) => {
   } else {
     console.log("No address data found");
     res.render("users/savedAddress", {
-      footer: true,
       user,
       cartCount,
       address: [],
@@ -665,7 +640,48 @@ exports.savedAddressget = async (req, res) => {
   }
   // Clear any existing session data for address
   req.session.address = null;
-}
+};
+
+exports.savedAddressPost = async (req, res) => {
+  let user = req.session.user._id;
+  console.log(user, "user found");
+  console.log(req.body);
+  let addaddress = {
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
+    state: req.body.state,
+    streetaddress: req.body.address,
+    appartment: req.body.appartment,
+    town: req.body.town,
+    zip: req.body.postcode,
+    mobile: req.body.mobile,
+    email: req.body.email,
+    radio: req.body.optradio,
+  };
+  try {
+    const data = await Address.findOne({ user: user });
+    if (data) {
+      data.address.push(addaddress);
+      const updated_data = await Address.findOneAndUpdate(
+        { user: user },
+        { $set: { address: data.address } },
+        { returnDocument: "after" }
+      );
+      console.log(updated_data, "updated address collection");
+    } else {
+      const address = new Address({
+        user: req.session.user._id,
+        address: [addaddress],
+      });
+      const address_data = await address.save();
+      console.log(address_data, "address collection");
+    }
+
+    res.json(true);
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 exports.editSavedAddress = async (req, res) => {
   try {
@@ -847,9 +863,7 @@ exports.userProfile = async (req, res) => {
 
   // Access cartCount value from req object
   const cartCount = req.cartCount;
-  const address = addressData[0].address;
-  if (addressData.length > 0 && addressData) {
-
+  const address = addressData.length > 0 ? addressData[0].address : null
     res.render("users/userprofile", {
       address,
       userDetails,
@@ -857,9 +871,30 @@ exports.userProfile = async (req, res) => {
       cartCount,
       balance,
     });
-  } else {
-    res.redirect('/address')
-  }
+};
+
+exports.updateUserAddress = async (req, res) => {
+  // console.log(req.body.userId, "idddd");
+  let user = req.session.user;
+  const address = await User.findOneAndUpdate(
+    { _id: user._id },
+    {
+      $push: {
+        address: {
+          name: req.body.name,
+          mobile: req.body.mobile,
+          addressDetails: req.body.addressDetails,
+          city: req.body.city,
+          state: req.body.state,
+          zip: req.body.zip,
+          typeOfAddress: req.body.typeOfAddress,
+        },
+      },
+    },
+    { new: true }
+  );
+  console.log(address, "address");
+  res.json(address);
 };
 
 exports.editUserProfile = async (req, res) => {
