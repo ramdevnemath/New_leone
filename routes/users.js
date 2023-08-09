@@ -42,15 +42,9 @@ router.get('/checkLogin', cartController.checkLogin)
 router.post('/emailexists', userController.emailVerify)
 
 // Proceed to checkout
-<<<<<<< HEAD
 router.get('/address', userController.deliveryAddress)
 router.post('/address', userController.deliveryAddressPost)
 router.get('/savedAddress', userController.isLogin, cartController.cartCount, userController.savedAddressget)
-=======
-router.get('/address', userController.isLogin, userController.savedAddressget)
-router.post('/address', userController.placeOrderPost)
-router.get('/savedAddress', userController.isLogin, cartController.cartCount, userController.deliveryAddress)
->>>>>>> 46219b36362a1f125b5e349f87ad27daa1bfe261
 router.post('/savedAddress', userController.savedAddressPost)
 router.get('/editSavedAddress/:id', cartController.cartCount, userController.editSavedAddress)
 router.post('/editSavedAddress/:id', userController.editSavedAddressPost)
